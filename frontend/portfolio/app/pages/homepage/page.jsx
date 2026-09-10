@@ -223,35 +223,82 @@ export default function HeroSection({ phone = "", onSubmit } = {}) {
     const [activeService, setActiveService] = useState("web");
     const accordionId = useId();
 
-    const [status, setStatus] = useState("idle");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState("");
     const [message, setMessage] = useState("");
-
-    const isSubmitting = status === "submitting";
-    const canSubmit = typeof onSubmit === "function";
 
     async function handleSubmit(event) {
         event.preventDefault();
 
-        if (!canSubmit || isSubmitting) return;
+        if (isSubmitting) return;
 
         const form = event.currentTarget;
-        const values = Object.fromEntries(new FormData(form).entries());
 
-        setStatus("submitting");
+        if (!form.reportValidity()) return;
+
+        // Read the fields before disabling the form.
+        const formData = new FormData(form);
+
+        const payload = {
+            name: String(formData.get("name") || "").trim(),
+            email: String(formData.get("email") || "").trim(),
+            service: String(formData.get("service") || ""),
+            engagement: String(formData.get("engagement") || ""),
+            message: String(formData.get("message") || "").trim(),
+        };
+
+        setIsSubmitting(true);
+        setStatus("");
         setMessage("");
 
         try {
-            // The supplied handler must throw if the request fails.
-            await onSubmit(values);
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-            form.reset();
+            if (!apiUrl) {
+                throw new Error("The contact service has not been configured.");
+            }
+
+            const response = await fetch(
+                `${apiUrl.replace(/\/$/, "")}/api/messages`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            // Handle JSON responses and empty/non-JSON error responses.
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                const serverMessage = data?.message || data?.error;
+
+                throw new Error(
+                    typeof serverMessage === "string"
+                        ? serverMessage
+                        : "Could not send your message. Please try again."
+                );
+            }
+
             setStatus("success");
-            setMessage("Thanks! Your message has been sent.");
-        } catch {
+            setMessage("Your message has been sent. We’ll get back to you soon!");
+            alert("Your message has been sent. We’ll get back to you soon!");
+            form.reset();
+        } catch (error) {
             setStatus("error");
-            setMessage("Your message couldn’t be sent. Please try again.");
+            setMessage(
+                error instanceof TypeError
+                    ? "Cannot reach the contact service. Please try again shortly."
+                    : error.message || "Something went wrong. Please try again."
+            );
+        } finally {
+            setIsSubmitting(false);
         }
     }
+
+
 
     function toggleService(id) {
         setActiveService((current) => (current === id ? null : id));
@@ -1045,7 +1092,7 @@ export default function HeroSection({ phone = "", onSubmit } = {}) {
 
                                     <button
                                         type="submit"
-                                        disabled={!canSubmit || isSubmitting}
+                                        disabled={isSubmitting}
                                         className="group inline-flex min-h-14 w-full items-center justify-between gap-8 rounded-full bg-orange-500 px-7 text-sm font-semibold text-black transition-colors hover:bg-orange-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-500 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
                                     >
                                         {isSubmitting ? "Sending..." : "Let’s make it happen"}
