@@ -1,7 +1,3 @@
-const dns = require("node:dns");
-
-// Use these DNS resolvers for Node.js DNS queries.
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 require("dotenv").config();
 
