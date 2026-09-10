@@ -17,9 +17,9 @@ const links = [
     // These sections must exist on the homepage for their links to scroll.
 
 ];
-const pricingLink = { label: "Pricing", href: homeSection("pricing") };
+
 const contactLink = { label: "Contact", href: homeSection("contact") };
-const mobileLinks = [...links, pricingLink, contactLink];
+const mobileLinks = [...links, contactLink];
 const normalizePath = (path) => path.replace(/\/+$/, "") || "/";
 
 function Logo({ className = "", onClick }) {
