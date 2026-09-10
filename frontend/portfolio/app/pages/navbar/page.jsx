@@ -127,13 +127,7 @@ export default function Navbar() {
                 <nav aria-label="Main navigation" className="mx-auto flex max-w-[1920px] items-center justify-between px-6 py-6 sm:px-10 lg:px-[4.5%]">
                     <Logo className="inline-flex" onClick={handleNavigationClick} />
                     <div className="flex items-center gap-5 sm:gap-7">
-                        <Link
-                            href={pricingLink.href}
-                            onClick={handleNavigationClick}
-                            className="hidden text-sm font-medium tracking-wide text-white transition-colors hover:text-orange-500 sm:block"
-                        >
-                            Pricing
-                        </Link>
+
                         <Link href={contactLink.href} onClick={handleNavigationClick} className={contactClass}>
                             Get Started
                         </Link>
