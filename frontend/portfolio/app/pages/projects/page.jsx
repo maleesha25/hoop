@@ -22,7 +22,7 @@ const projects = [
         technologies: ["Next.js", "Node.js", "MongoDB", "Python"],
 
         // Example: "/images/projects/hoop-dashboard.png"
-        image: "",
+        image: "/images/hoop.png",
         imageAlt: "Hoop lead generation dashboard",
 
         // Add your actual URLs. Leave blank to hide the links.
@@ -38,7 +38,7 @@ const projects = [
         description:
             "A tourism website introducing Sri Lankan destinations and travel services, helping visitors explore their options and contact the business.",
         technologies: ["HTML", "CSS", "JavaScript", "MySQL"],
-        image: "",
+        image: "/images/nmlanka.png",
         imageAlt: "NM Lanka Tour Takers website",
         liveUrl: "",
         githubUrl: "",
@@ -52,7 +52,7 @@ const projects = [
         description:
             "A Flutter mobile application featuring account registration, login, and a home interface designed for mobile use.",
         technologies: ["Flutter", "Dart"],
-        image: "",
+        image: "/images/passenger.png",
         imageAlt: "Passenger mobile application screens",
         liveUrl: "",
         githubUrl: "",
@@ -66,7 +66,7 @@ const projects = [
         description:
             "A platform to make hotel reservations.",
         technologies: ["HTML", "Tailwind CSS", "Java", "MySQL"],
-        image: "",
+        image: "/images/ocenviewlogo.png",
         imageAlt: "Hotel Reservation System interface",
         liveUrl: "",
         githubUrl: "",

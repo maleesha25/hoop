@@ -144,7 +144,7 @@ const featuredProjects = [
         category: "Full-stack application",
         description:
             "An AI-powered platform for discovering business leads and managing outreach.",
-        image: "/images/projects/hoop.png",
+        image: "/images/hoop.png",
         technologies: ["Next.js", "Node.js", "MongoDB", "Python"],
     },
     {
@@ -154,7 +154,7 @@ const featuredProjects = [
         category: "Tourism website",
         description:
             "A travel website showcasing Sri Lankan destinations and tourism services.",
-        image: "/images/projects/tourism.png",
+        image: "/images/nmlanka.png",
         technologies: ["HTML", "CSS", "JavaScript", "MySQL"],
     },
     {
@@ -163,8 +163,8 @@ const featuredProjects = [
         title: "Passenger",
         category: "Mobile application",
         description:
-            "A Flutter application with account registration, login, and a mobile home interface.",
-        image: "/images/projects/passenger.png",
+            "A Flutter application with account registration, login, and a mobile home interface.Main purpose is to book bus seats",
+        image: "/images/passenger.png",
         technologies: ["Flutter", "Dart"],
     },
 ];
