@@ -1,16 +1,16 @@
+const dns = require("node:dns");
+
+// Use these DNS resolvers for Node.js DNS queries.
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const messageRoutes = require("./routes/message");
 
 const app = express();
-app.use(express.json());
-
-const PORT = process.env.PORT || 5000;
-
-mongoose.connect("mongodb://localhost:27017/hoop")
-    .then(() => { console.log("Connected to MongoDB"); })
-    .catch((error) => { console.error("Error connecting to MongoDB:", error); });
 
 app.use(
     cors({
@@ -18,9 +18,76 @@ app.use(
     })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 
-app.use("/api/messages", messageRoutes);
+// Reuse the connection within this server instance.
+let connectionPromise;
 
+async function connectDB() {
+    if (!process.env.MONGODB_URI) {
+        throw new Error("MONGODB_URI is not configured");
+    }
 
-app.listen(PORT, () => { console.log(`Server is running on port ${PORT}`); });
+    if (!connectionPromise) {
+        connectionPromise = mongoose
+            .connect(process.env.MONGODB_URI, {
+                serverSelectionTimeoutMS: 10000,
+                maxPoolSize: 5,
+            })
+            .catch((error) => {
+                connectionPromise = undefined;
+                throw error;
+            });
+    }
+
+    return connectionPromise;
+}
+
+// Checks the API and database connection.
+app.get("/api/health", async (req, res) => {
+    try {
+        await connectDB();
+
+        res.json({
+            status: "ok",
+            database: "connected",
+        });
+    } catch (error) {
+        console.error("Database health check failed:", error.message);
+
+        res.status(503).json({
+            status: "error",
+            message: "Database unavailable",
+        });
+    }
+});
+
+// Wait for MongoDB before processing message requests.
+app.use(
+    "/api/messages",
+    async (req, res, next) => {
+        try {
+            await connectDB();
+            next();
+        } catch (error) {
+            console.error("Database connection failed:", error.message);
+
+            res.status(503).json({
+                message: "Service temporarily unavailable. Please try again.",
+            });
+        }
+    },
+    messageRoutes
+);
+
+// Run a local server when started with `node server.js`.
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+// Vercel uses this exported Express app.
+module.exports = app;
